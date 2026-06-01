@@ -16,7 +16,7 @@ public class SkisPersistence extends BasePersistence<Skis, UUID> {
      */
     @Override
     protected String getCsvPath() {
-        return "src/main/resources/skis.csv";
+        return "src/main/resources/ski.csv";
     }
 
     /**

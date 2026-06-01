@@ -12,7 +12,7 @@ public class RenteePersistence extends BasePersistence<Rentee, String> {
      */
     @Override
     protected String getCsvPath() {
-        return "src/main/resources/rentees.csv";
+        return "src/main/resources/rentee.csv";
     }
 
     /**

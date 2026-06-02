@@ -9,6 +9,7 @@ import java.util.UUID;
 
 public class RentalPersistence extends BasePersistence<Rental, UUID> {
     private final RenteePersistence renteePersistence = new RenteePersistence();
+    private final SkisPersistence skisPersistence = new SkisPersistence();
     private final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
 
     /**
@@ -32,11 +33,12 @@ public class RentalPersistence extends BasePersistence<Rental, UUID> {
         return new Rental(
                 UUID.fromString(csvValues[0]),
                 renteePersistence.findById(csvValues[1]).get(),
-                LocalDateTime.parse(csvValues[2], FORMATTER),
+                skisPersistence.findById(UUID.fromString(csvValues[2])).get(),
                 LocalDateTime.parse(csvValues[3], FORMATTER),
                 LocalDateTime.parse(csvValues[4], FORMATTER),
                 LocalDateTime.parse(csvValues[5], FORMATTER),
-                Boolean.parseBoolean(csvValues[6])
+                LocalDateTime.parse(csvValues[6], FORMATTER),
+                Boolean.parseBoolean(csvValues[7])
         );
     }
 

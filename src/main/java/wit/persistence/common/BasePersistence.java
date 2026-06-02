@@ -76,7 +76,7 @@ public abstract class BasePersistence<T extends EntityBase<TId>, TId> {
         return rentees;
     }
 
-    public Optional<T> findById(String id) {
+    public Optional<T> findById(TId id) {
         return findAll().stream()
                 .filter(r -> r.getId().equals(id))
                 .findFirst();

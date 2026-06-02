@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public class Rental extends EntityBase<UUID> {
     private final Rentee rentee;
+    private final Skis skis;
     private final LocalDateTime beginDate;
     private final LocalDateTime plannedEndDate;
     private LocalDateTime secondaryPlannedEndDate;
@@ -16,10 +17,11 @@ public class Rental extends EntityBase<UUID> {
     /**
      * Recommended constructor
      */
-    public Rental(Rentee rentee, LocalDateTime beginDate, LocalDateTime plannedEndDate) {
+    public Rental(Rentee rentee, Skis skis, LocalDateTime plannedEndDate) {
         super(UUID.randomUUID());
         this.rentee = rentee;
-        this.beginDate = beginDate;
+        this.skis = skis;
+        this.beginDate = LocalDateTime.now();
         this.plannedEndDate = plannedEndDate;
         this.isEnded = false;
         this.secondaryPlannedEndDate = null;
@@ -29,9 +31,10 @@ public class Rental extends EntityBase<UUID> {
     /**
      * Constructor to be able to reconstruct the entity from the persistence
      */
-    public Rental(UUID id, Rentee rentee, LocalDateTime beginDate, LocalDateTime plannedEndDate, LocalDateTime secondaryPlannedEndDate, LocalDateTime actualEndDate, boolean isEnded) {
+    public Rental(UUID id, Rentee rentee, Skis skis, LocalDateTime beginDate, LocalDateTime plannedEndDate, LocalDateTime secondaryPlannedEndDate, LocalDateTime actualEndDate, boolean isEnded) {
         super(id);
         this.rentee = rentee;
+        this.skis = skis;
         this.beginDate = beginDate;
         this.plannedEndDate = plannedEndDate;
         this.secondaryPlannedEndDate = secondaryPlannedEndDate;
@@ -45,6 +48,10 @@ public class Rental extends EntityBase<UUID> {
 
     public LocalDateTime getBeginDate() {
         return beginDate;
+    }
+
+    public Skis getSkis() {
+        return skis;
     }
 
     public LocalDateTime getPlannedEndDate() {

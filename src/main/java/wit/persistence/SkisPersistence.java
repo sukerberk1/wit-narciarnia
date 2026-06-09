@@ -16,7 +16,7 @@ public class SkisPersistence extends BasePersistence<Skis, UUID> {
      */
     @Override
     protected String getCsvPath() {
-        return "src/main/resources/skis.csv";
+        return "src/main/resources/ski.csv";
     }
 
     /**
@@ -29,7 +29,7 @@ public class SkisPersistence extends BasePersistence<Skis, UUID> {
     protected Skis constructFromCsv(String[] csvValues) {
         return new Skis(
                 UUID.fromString(csvValues[0]),
-                skisTypePersistence.findById(csvValues[1]).get(),
+                skisTypePersistence.findById(UUID.fromString(csvValues[1])).get(),
                 csvValues[2],
                 csvValues[3],
                 SkiTiesType.getSkiTiesType(csvValues[4]),

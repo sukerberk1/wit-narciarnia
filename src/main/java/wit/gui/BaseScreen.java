@@ -11,12 +11,14 @@ public abstract class BaseScreen {
     protected ResourceBundle bundle;
     protected String bundleName;
 
+    private boolean isInitialized = false;
+
     public BaseScreen(String bundleName,Locale initialLocale) {
         this.bundle = ResourceBundle.getBundle(bundleName, initialLocale);
         this.bundleName = bundleName;
 
         window = new JFrame();
-        window.setSize(600, 500);
+        window.setSize(800, 600);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setLayout(new BorderLayout());
 
@@ -35,9 +37,6 @@ public abstract class BaseScreen {
         //pusty panel na content okien
         mainPanel = new JPanel();
         window.add(mainPanel, BorderLayout.CENTER);
-
-        buildUI();
-        updateTexts();
     }
 
     //tworzenie layoutu w mainPanel
@@ -52,6 +51,11 @@ public abstract class BaseScreen {
     }
 
     public void show() {
+        if (!isInitialized) {
+            buildUI();
+            updateTexts();
+            isInitialized = true;
+        }
         window.setVisible(true);
     }
 

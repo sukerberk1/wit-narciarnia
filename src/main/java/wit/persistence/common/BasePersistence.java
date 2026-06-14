@@ -65,10 +65,8 @@ public abstract class BasePersistence<T extends EntityBase<TId>, TId> {
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
-                String[] values = line.split(CSV_SEPARATOR);
-                if (values.length >= 4) {
-                    rentees.add(constructFromCsv(values));
-                }
+                String[] values = line.split(CSV_SEPARATOR, -1);
+                rentees.add(constructFromCsv(values));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -99,7 +97,7 @@ public abstract class BasePersistence<T extends EntityBase<TId>, TId> {
         }
     }
 
-    public void delete(String id) {
+    public void delete(TId id) {
         List<T> all = findAll();
         List<T> filtered = all.stream()
                 .filter(r -> !r.getId().equals(id))

@@ -36,8 +36,8 @@ public class RentalPersistence extends BasePersistence<Rental, UUID> {
                 skisPersistence.findById(UUID.fromString(csvValues[2])).get(),
                 LocalDateTime.parse(csvValues[3], FORMATTER),
                 LocalDateTime.parse(csvValues[4], FORMATTER),
-                LocalDateTime.parse(csvValues[5], FORMATTER),
-                LocalDateTime.parse(csvValues[6], FORMATTER),
+                parseNullableDate(csvValues[5]),
+                parseNullableDate(csvValues[6]),
                 Boolean.parseBoolean(csvValues[7])
         );
     }
@@ -53,11 +53,36 @@ public class RentalPersistence extends BasePersistence<Rental, UUID> {
         return String.join(CSV_SEPARATOR,
                 entity.getId().toString(),
                 entity.getRentee().getId(),
+                entity.getSkis().getId().toString(),
                 entity.getBeginDate().format(FORMATTER),
                 entity.getPlannedEndDate().format(FORMATTER),
-                entity.getSecondaryPlannedEndDate().format(FORMATTER),
-                entity.getActualEndDate().format(FORMATTER),
+                formatNullableDate(entity.getSecondaryPlannedEndDate()),
+                formatNullableDate(entity.getActualEndDate()),
                 Boolean.toString(entity.isEnded())
         );
+    }
+
+    /**
+    * Zamienia datę na tekst przeznaczony do zapisu w pliku CSV.
+    * Dla pustej daty zwraca pusty tekst.
+     *
+     * @param date zapisywana data lub null
+     * @return data w formacie tekstowym albo pusty tekst
+    */
+
+    private String formatNullableDate(LocalDateTime date) {
+        return date != null ? date.format(FORMATTER) : "";
+    }
+
+    /**
+     * Zamienia tekst z pliku CSV na datę.
+     * Dla pustego tekstu zwraca null.
+     *
+     * @param dateStr tekst reprezentujący datę lub pusty tekst
+     * @return obiekt LocalDateTime albo null
+     */
+
+    private LocalDateTime parseNullableDate(String dateStr) {
+        return dateStr != null && !dateStr.isEmpty() ? LocalDateTime.parse(dateStr, FORMATTER) : null;
     }
 }

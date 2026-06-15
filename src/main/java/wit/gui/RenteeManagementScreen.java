@@ -73,9 +73,8 @@ public class RenteeManagementScreen extends BaseScreen {
         btnDelete.setText(bundle.getString("btn.delete"));
         btnBack.setText(bundle.getString("btn.back"));
 
-        // Zmieniono kolumny, by pasowały do CSV (ID pełni rolę numeru dokumentu)
         tableModel.setColumnIdentifiers(new String[]{
-                bundle.getString("table.column.document"), // ID to nr dokumentu
+                bundle.getString("table.column.document"),
                 bundle.getString("table.column.firstname"),
                 bundle.getString("table.column.lastname"),
                 bundle.getString("table.column.description")
@@ -88,7 +87,7 @@ public class RenteeManagementScreen extends BaseScreen {
         List<Rentee> clients = persistence.findAll();
         for (Rentee client : clients) {
             tableModel.addRow(new Object[]{
-                    client.getId(),          // Zamiast UUID.toString(), po prostu pobieramy ID (nr dokumentu)
+                    client.getId(),
                     client.getFirstName(),
                     client.getLastName(),
                     client.getDescription()
@@ -129,7 +128,6 @@ public class RenteeManagementScreen extends BaseScreen {
                 return;
             }
 
-            // Tworzymy Rentee na podstawie konstruktora widzianego w persistence
             Rentee newClient = new Rentee(documentId, firstName, lastName, description);
             persistence.save(newClient);
             loadData();
@@ -152,8 +150,6 @@ public class RenteeManagementScreen extends BaseScreen {
             JOptionPane.showMessageDialog(window, bundle.getString("error.no_selection"));
             return;
         }
-
-        // Pobieramy ID (String)
         String id = tableModel.getValueAt(selectedRow, 0).toString();
         Rentee client = persistence.findById(id).orElse(null); // Brak konwersji na UUID
         if (client == null) return;

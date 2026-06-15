@@ -53,6 +53,7 @@ public class RentalPersistence extends BasePersistence<Rental, UUID> {
         return String.join(CSV_SEPARATOR,
                 entity.getId().toString(),
                 entity.getRentee().getId(),
+                entity.getSkis().getId().toString(),
                 entity.getBeginDate().format(FORMATTER),
                 entity.getPlannedEndDate().format(FORMATTER),
                 entity.getSecondaryPlannedEndDate().format(FORMATTER),

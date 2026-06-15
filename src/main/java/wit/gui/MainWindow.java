@@ -27,6 +27,11 @@ public class MainWindow extends BaseScreen {
         btnRentee = UIFactory.createButton("");
         btnSkiis = UIFactory.createButton("");
 
+
+        btnRentee.addActionListener(e -> {
+            dispose();
+            new RenteeManagementScreen(bundle.getLocale()).show();
+        });
         btnSkiis.addActionListener(e -> {
             dispose();
             new SkisTypeManagementScreen(bundle.getLocale()).show();

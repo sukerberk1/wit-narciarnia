@@ -16,6 +16,7 @@ public class MainWindow extends BaseScreen {
         super("mainwindow" ,locale);
     }
 
+
     @Override
     protected void buildUI(){
         mainPanel.setLayout(new GridLayout(4,1,0,10));
@@ -26,10 +27,24 @@ public class MainWindow extends BaseScreen {
         btnRentee = UIFactory.createButton("");
         btnSkiis = UIFactory.createButton("");
 
+        btnRental.addActionListener(e -> {
+            dispose();
+            new RentalManagementScreen(bundle.getLocale()).show();
+        });
+        btnRentee.addActionListener(e -> {
+            dispose();
+            new RenteeManagementScreen(bundle.getLocale()).show();
+        });
+        btnSkiis.addActionListener(e -> {
+            dispose();
+            new SkisTypeManagementScreen(bundle.getLocale()).show();
+        });
+
         mainPanel.add(greeting);
         mainPanel.add(btnRental);
         mainPanel.add(btnRentee);
         mainPanel.add(btnSkiis);
+
     }
 
     @Override

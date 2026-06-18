@@ -254,7 +254,7 @@ public class RentalManagementScreen extends BaseScreen {
 
         if (confirm == JOptionPane.YES_OPTION) {
             String id = tableModel.getValueAt(selectedRow, 0).toString();
-            rentalPersistence.delete(String.valueOf(UUID.fromString(id)));
+            rentalPersistence.delete(UUID.fromString(id));
             loadData();
         }
     }

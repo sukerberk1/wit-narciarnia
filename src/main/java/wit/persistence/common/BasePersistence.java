@@ -53,7 +53,7 @@ public abstract class BasePersistence<T extends EntityBase<TId>, TId> {
     public void save(T entity) {
         List<T> all = findAll();
         if (all.stream().anyMatch(r -> r.getId().equals(entity.getId()))) {
-            throw new IllegalArgumentException("Rentee with ID " + entity.getId() + " already exists.");
+            throw new IllegalArgumentException("Entity with ID " + entity.getId() + " already exists.");
         }
         all.add(entity);
         saveAll(all);

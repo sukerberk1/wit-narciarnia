@@ -21,7 +21,7 @@ class RentalPersistenceTest {
 
     private static final Path RENTAL_FILE = Path.of("src/main/resources/rental.csv");
     private static final Path RENTEE_FILE = Path.of("src/main/resources/rentee.csv");
-    private static final Path SKIS_FILE = Path.of("src/main/resources/skis.csv");
+    private static final Path SKIS_FILE = Path.of("src/main/resources/ski.csv");
     private static final Path SKIS_TYPE_FILE = Path.of("src/main/resources/skisType.csv");
 
     private RentalPersistence rentalPersistence;
@@ -31,10 +31,10 @@ class RentalPersistenceTest {
 
     @BeforeEach
     void setUp() throws IOException {
-//        backupFile(RENTAL_FILE);
-//        backupFile(RENTEE_FILE);
-//        backupFile(SKIS_FILE);
-//        backupFile(SKIS_TYPE_FILE);
+        backupFile(RENTAL_FILE);
+        backupFile(RENTEE_FILE);
+        backupFile(SKIS_FILE);
+        backupFile(SKIS_TYPE_FILE);
 
         rentalPersistence = new RentalPersistence();
         renteePersistence = new RenteePersistence();
@@ -42,13 +42,13 @@ class RentalPersistenceTest {
         skisTypePersistence = new SkisTypePersistence();
     }
 
-//    @AfterEach
-//    void tearDown() throws IOException {
-//        restoreFile(RENTAL_FILE);
-//        restoreFile(RENTEE_FILE);
-//        restoreFile(SKIS_FILE);
-//        restoreFile(SKIS_TYPE_FILE);
-//    }
+    @AfterEach
+    void tearDown() throws IOException {
+        restoreFile(RENTAL_FILE);
+        restoreFile(RENTEE_FILE);
+        restoreFile(SKIS_FILE);
+        restoreFile(SKIS_TYPE_FILE);
+    }
 
     private void backupFile(Path path) throws IOException {
         if (Files.exists(path)) {

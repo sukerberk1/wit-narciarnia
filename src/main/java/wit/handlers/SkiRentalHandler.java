@@ -24,7 +24,7 @@ public class SkiRentalHandler {
      * @param plannedEndDate planned end date of the rental
      * @return The Rental if operation is successful, empty optional otherwise.
      */
-    public Optional<Rental> handle(String renteeId, UUID skisToRentId, LocalDateTime plannedEndDate) {
+    public Optional<Rental> handleRent(String renteeId, UUID skisToRentId, LocalDateTime plannedEndDate) {
         boolean isRentedNow = rentalPersistence.findAll().stream()
                 .filter(o -> skisToRentId.equals(o.getSkis().getId()))
                 .anyMatch(o -> !o.isEnded());
@@ -35,6 +35,20 @@ public class SkiRentalHandler {
         Rental rental = new Rental(rentee, skis, plannedEndDate);
         rentalPersistence.save(rental);
         return Optional.of(rental);
+    }
+
+    public Rental handleProlongRental(UUID rentalId) {
+        Rental rental = rentalPersistence.findById(rentalId).get();
+        rental.prolongRental();
+        rentalPersistence.update(rental);
+        return rental;
+    }
+
+    public Rental endRental(UUID rentalId) {
+        Rental rental = rentalPersistence.findById(rentalId).get();
+        rental.endRental();
+        rentalPersistence.update(rental);
+        return rental;
     }
 
 }

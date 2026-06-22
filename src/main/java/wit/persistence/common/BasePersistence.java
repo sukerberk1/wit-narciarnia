@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public abstract class BasePersistence<T extends EntityBase<TId>, TId> {
     // Configuration
-    protected final String CSV_SEPARATOR = ",";
+    protected final String CSV_SEPARATOR = "%%%";
 
     /**
      * Must return valid path to the CSV database file.
@@ -50,28 +50,28 @@ public abstract class BasePersistence<T extends EntityBase<TId>, TId> {
         }
     }
 
-    public void save(T rentee) {
+    public void save(T entity) {
         List<T> all = findAll();
-        if (all.stream().anyMatch(r -> r.getId().equals(rentee.getId()))) {
-            throw new IllegalArgumentException("Rentee with ID " + rentee.getId() + " already exists.");
+        if (all.stream().anyMatch(r -> r.getId().equals(entity.getId()))) {
+            throw new IllegalArgumentException("Entity with ID " + entity.getId() + " already exists.");
         }
-        all.add(rentee);
+        all.add(entity);
         saveAll(all);
     }
 
     public List<T> findAll() {
-        List<T> rentees = new ArrayList<>();
+        List<T> entities = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(getCsvPath()))) {
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
                 String[] values = line.split(CSV_SEPARATOR, -1);
-                rentees.add(constructFromCsv(values));
+                entities.add(constructFromCsv(values));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return rentees;
+        return entities;
     }
 
     public Optional<T> findById(TId id) {
@@ -80,12 +80,12 @@ public abstract class BasePersistence<T extends EntityBase<TId>, TId> {
                 .findFirst();
     }
 
-    public void update(T updatedRentee) {
+    public void update(T entityToUpdate) {
         List<T> all = findAll();
         boolean found = false;
         for (int i = 0; i < all.size(); i++) {
-            if (all.get(i).getId().equals(updatedRentee.getId())) {
-                all.set(i, updatedRentee);
+            if (all.get(i).getId().equals(entityToUpdate.getId())) {
+                all.set(i, entityToUpdate);
                 found = true;
                 break;
             }
@@ -93,7 +93,7 @@ public abstract class BasePersistence<T extends EntityBase<TId>, TId> {
         if (found) {
             saveAll(all);
         } else {
-            throw new NoSuchElementException("Rentee not found for update.");
+            throw new NoSuchElementException("Entity [" + entityToUpdate.getClass().getSimpleName() + "] not found for update.");
         }
     }
 

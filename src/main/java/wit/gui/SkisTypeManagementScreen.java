@@ -218,7 +218,7 @@ public class SkisTypeManagementScreen extends BaseScreen {
 
         if (confirm == JOptionPane.YES_OPTION) {
             String id = tableModel.getValueAt(selectedRow, 0).toString();
-            persistence.delete(id);
+            persistence.delete(UUID.fromString(id));
             loadData();
             JOptionPane.showMessageDialog(window, bundle.getString("success.deleted"));
         }

@@ -3,6 +3,9 @@ package wit.gui;
 import wit.domain.Rental;
 import wit.domain.Rentee;
 import wit.domain.Skis;
+import wit.handlers.RenteeHandler;
+import wit.handlers.SkiRentalHandler;
+import wit.handlers.SkisHandler;
 import wit.persistence.RentalPersistence;
 import wit.persistence.RenteePersistence;
 import wit.persistence.SkisPersistence;
@@ -21,17 +24,17 @@ public class RentalManagementScreen extends BaseScreen {
     private DefaultTableModel tableModel;
     private JButton btnAdd, btnReturn, btnDelete, btnBack;
 
-    private final RentalPersistence rentalPersistence;
-    private final RenteePersistence renteePersistence;
-    private final SkisPersistence skisPersistence;
+    private final SkiRentalHandler skiRentalHandler;
+    private final RenteeHandler renteeHandler;
+    private final SkisHandler skisHandler;
 
     private final DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     public RentalManagementScreen(Locale locale) {
         super("RentalManagement", locale);
-        this.rentalPersistence = new RentalPersistence();
-        this.renteePersistence = new RenteePersistence();
-        this.skisPersistence = new SkisPersistence();
+        this.skiRentalHandler = new SkiRentalHandler();
+        this.renteeHandler = new RenteeHandler();
+        this.skisHandler = new SkisHandler();
     }
 
     @Override
@@ -94,7 +97,7 @@ public class RentalManagementScreen extends BaseScreen {
 
     private void loadData() {
         tableModel.setRowCount(0);
-        List<Rental> rentals = rentalPersistence.findAll();
+        List<Rental> rentals = skiRentalHandler.getAllRentals();
         for (Rental rental : rentals) {
             String clientInfo = rental.getRentee().getFirstName() + " " + rental.getRentee().getLastName();
             String skisInfo = rental.getSkis().getBrand() + " " + rental.getSkis().getModel();
@@ -117,8 +120,8 @@ public class RentalManagementScreen extends BaseScreen {
         dialog.setSize(500, 300);
 
         // Rozwijane listy dla klientów i nart
-        JComboBox<Rentee> cbRentee = new JComboBox<>(renteePersistence.findAll().toArray(new Rentee[0]));
-        JComboBox<Skis> cbSkis = new JComboBox<>(skisPersistence.findAll().toArray(new Skis[0]));
+        JComboBox<Rentee> cbRentee = new JComboBox<>(renteeHandler.getAll().toArray(new Rentee[0]));
+        JComboBox<Skis> cbSkis = new JComboBox<>(skisHandler.getAll().toArray(new Skis[0]));
 
         // Renderery, żeby w liście wyświetlał się ładny tekst, a nie hash obiektu
         cbRentee.setRenderer(new DefaultListCellRenderer() {
@@ -185,7 +188,8 @@ public class RentalManagementScreen extends BaseScreen {
                         false // isEnded
                 );
 
-                rentalPersistence.save(newRental);
+                skiRentalHandler.handleRent(selectedRentee.getId(), selectedSkis.getId(), end);
+
                 loadData();
                 JOptionPane.showMessageDialog(dialog, bundle.getString("success.saved"));
                 dialog.dispose();
@@ -209,8 +213,8 @@ public class RentalManagementScreen extends BaseScreen {
             return;
         }
 
-        String id = tableModel.getValueAt(selectedRow, 0).toString();
-        Rental rental = rentalPersistence.findById(UUID.fromString(id)).orElse(null);
+        UUID rentalId =UUID.fromString( tableModel.getValueAt(selectedRow, 0).toString());
+        Rental rental = skiRentalHandler.getById(rentalId).orElse(null);
 
         if (rental == null || rental.isEnded()) {
             JOptionPane.showMessageDialog(window, bundle.getString("error.already_returned"));
@@ -223,18 +227,7 @@ public class RentalManagementScreen extends BaseScreen {
                 JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
-            Rental updatedRental = new Rental(
-                    rental.getId(),
-                    rental.getRentee(),
-                    rental.getSkis(),
-                    rental.getBeginDate(),
-                    rental.getPlannedEndDate(),
-                    rental.getSecondaryPlannedEndDate(),
-                    LocalDateTime.now(),
-                    true
-            );
-
-            rentalPersistence.update(updatedRental);
+            skiRentalHandler.endRental(rentalId);
             loadData();
             JOptionPane.showMessageDialog(window, bundle.getString("success.returned"));
         }
@@ -254,7 +247,7 @@ public class RentalManagementScreen extends BaseScreen {
 
         if (confirm == JOptionPane.YES_OPTION) {
             String id = tableModel.getValueAt(selectedRow, 0).toString();
-            rentalPersistence.delete(UUID.fromString(id));
+            skiRentalHandler.removeById(UUID.fromString(id));
             loadData();
         }
     }

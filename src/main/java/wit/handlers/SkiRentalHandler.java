@@ -8,6 +8,7 @@ import wit.persistence.RenteePersistence;
 import wit.persistence.SkisPersistence;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -49,6 +50,18 @@ public class SkiRentalHandler {
         rental.endRental();
         rentalPersistence.update(rental);
         return rental;
+    }
+
+    public List<Rental> getAllRentals() {
+        return rentalPersistence.findAll();
+    }
+
+    public Optional<Rental> getById(UUID rentalId) {
+        return rentalPersistence.findById(rentalId);
+    }
+
+    public void removeById(UUID rentalId) {
+        rentalPersistence.delete(rentalId);
     }
 
 }

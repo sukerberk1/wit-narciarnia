@@ -1,7 +1,7 @@
 package wit.gui;
 
 import wit.domain.Rentee;
-import wit.persistence.RenteePersistence;
+import wit.handlers.RenteeHandler;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -17,11 +17,11 @@ public class RenteeManagementScreen extends BaseScreen {
     private JTable table;
     private DefaultTableModel tableModel;
     private JButton btnAdd, btnEdit, btnDelete, btnBack;
-    private final RenteePersistence persistence;
+    private final RenteeHandler handler;
 
     public RenteeManagementScreen(Locale locale) {
         super("RenteeManagement", locale);
-        this.persistence = new RenteePersistence();
+        this.handler = new RenteeHandler();
     }
 
     @Override
@@ -84,7 +84,7 @@ public class RenteeManagementScreen extends BaseScreen {
 
     private void loadData() {
         tableModel.setRowCount(0);
-        List<Rentee> clients = persistence.findAll();
+        List<Rentee> clients = handler.getAll();
         for (Rentee client : clients) {
             tableModel.addRow(new Object[]{
                     client.getId(),
@@ -100,18 +100,18 @@ public class RenteeManagementScreen extends BaseScreen {
         dialog.setLayout(new GridLayout(5, 2, 10, 10));
         dialog.setSize(400, 250);
 
-        JTextField txtDocument = new JTextField(); // ID to nr dokumentu
-        JTextField txtFirstName = new JTextField();
-        JTextField txtLastName = new JTextField();
-        JTextField txtDescription = new JTextField();
+        JTextField txtDocument = UIFactory.createTextField(); // ID to nr dokumentu
+        JTextField txtFirstName = UIFactory.createTextField();
+        JTextField txtLastName = UIFactory.createTextField();
+        JTextField txtDescription = UIFactory.createTextField();
 
-        dialog.add(new JLabel(bundle.getString("label.document")));
+        dialog.add(UIFactory.createSubLabel(bundle.getString("label.document")));
         dialog.add(txtDocument);
-        dialog.add(new JLabel(bundle.getString("label.firstname")));
+        dialog.add(UIFactory.createSubLabel(bundle.getString("label.firstname")));
         dialog.add(txtFirstName);
-        dialog.add(new JLabel(bundle.getString("label.lastname")));
+        dialog.add(UIFactory.createSubLabel(bundle.getString("label.lastname")));
         dialog.add(txtLastName);
-        dialog.add(new JLabel(bundle.getString("label.description")));
+        dialog.add(UIFactory.createSubLabel(bundle.getString("label.description")));
         dialog.add(txtDescription);
 
         JButton btnSave = UIFactory.createButton(bundle.getString("btn.save"));
@@ -127,18 +127,31 @@ public class RenteeManagementScreen extends BaseScreen {
                 JOptionPane.showMessageDialog(dialog, bundle.getString("error.empty_fields"));
                 return;
             }
+            try {
+                handler.create(documentId, firstName, lastName, description);
 
-            Rentee newClient = new Rentee(documentId, firstName, lastName, description);
-            persistence.save(newClient);
-            loadData();
-            JOptionPane.showMessageDialog(dialog, bundle.getString("success.saved"));
-            dialog.dispose();
+                loadData();
+                JOptionPane.showMessageDialog(dialog, bundle.getString("success.saved"));
+                dialog.dispose();
+            }catch (Exception IllegalArgumentException){
+                JOptionPane.showMessageDialog(dialog, bundle.getString("dialog.id.exists"));
+            }
+
+
         });
 
         btnCancel.addActionListener(e -> dialog.dispose());
 
         dialog.add(btnSave);
         dialog.add(btnCancel);
+
+        // focus na cancel, zeby nie zaznaczal pierwszego jcombobox
+        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowOpened(java.awt.event.WindowEvent e) {
+                btnCancel.requestFocusInWindow();
+            }
+        });
 
         dialog.setLocationRelativeTo(window);
         dialog.setVisible(true);
@@ -151,27 +164,27 @@ public class RenteeManagementScreen extends BaseScreen {
             return;
         }
         String id = tableModel.getValueAt(selectedRow, 0).toString();
-        Rentee client = persistence.findById(id).orElse(null); // Brak konwersji na UUID
+        Rentee client = handler.getById(id).orElse(null); // Brak konwersji na UUID
         if (client == null) return;
 
         JDialog dialog = new JDialog(window, bundle.getString("dialog.edit.title"), true);
         dialog.setLayout(new GridLayout(5, 2, 10, 10));
         dialog.setSize(400, 250);
 
-        JTextField txtDocument = new JTextField(client.getId()); // Edycja ID (dokumentu) może być zablokowana
+        JTextField txtDocument = UIFactory.createTextField(client.getId()); // Edycja ID (dokumentu) może być zablokowana
         txtDocument.setEditable(false); // ID z reguły nie edytujemy, żeby nie popsuć bazy
 
-        JTextField txtFirstName = new JTextField(client.getFirstName());
-        JTextField txtLastName = new JTextField(client.getLastName());
-        JTextField txtDescription = new JTextField(client.getDescription());
+        JTextField txtFirstName = UIFactory.createTextField(client.getFirstName());
+        JTextField txtLastName = UIFactory.createTextField(client.getLastName());
+        JTextField txtDescription = UIFactory.createTextField(client.getDescription());
 
-        dialog.add(new JLabel(bundle.getString("label.document")));
+        dialog.add(UIFactory.createSubLabel(bundle.getString("label.document")));
         dialog.add(txtDocument);
-        dialog.add(new JLabel(bundle.getString("label.firstname")));
+        dialog.add(UIFactory.createSubLabel(bundle.getString("label.firstname")));
         dialog.add(txtFirstName);
-        dialog.add(new JLabel(bundle.getString("label.lastname")));
+        dialog.add(UIFactory.createSubLabel(bundle.getString("label.lastname")));
         dialog.add(txtLastName);
-        dialog.add(new JLabel(bundle.getString("label.description")));
+        dialog.add(UIFactory.createSubLabel(bundle.getString("label.description")));
         dialog.add(txtDescription);
 
         JButton btnSave = UIFactory.createButton(bundle.getString("btn.save"));
@@ -187,8 +200,8 @@ public class RenteeManagementScreen extends BaseScreen {
                 return;
             }
 
-            Rentee updatedClient = new Rentee(client.getId(), firstName, lastName, description);
-            persistence.update(updatedClient);
+            handler.update(client.getId(), firstName, lastName, description);
+
             loadData();
             JOptionPane.showMessageDialog(dialog, bundle.getString("success.saved"));
             dialog.dispose();
@@ -198,6 +211,14 @@ public class RenteeManagementScreen extends BaseScreen {
 
         dialog.add(btnSave);
         dialog.add(btnCancel);
+
+        // focus na cancel, zeby nie zaznaczal pierwszego jcombobox
+        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowOpened(java.awt.event.WindowEvent e) {
+                btnCancel.requestFocusInWindow();
+            }
+        });
 
         dialog.setLocationRelativeTo(window);
         dialog.setVisible(true);
@@ -217,7 +238,7 @@ public class RenteeManagementScreen extends BaseScreen {
 
         if (confirm == JOptionPane.YES_OPTION) {
             String id = tableModel.getValueAt(selectedRow, 0).toString(); // ID jako String
-            persistence.delete(id);
+            handler.delete(id);
             loadData();
             JOptionPane.showMessageDialog(window, bundle.getString("success.deleted"));
         }

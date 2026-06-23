@@ -1,7 +1,7 @@
 package wit.gui;
 
 import wit.domain.SkisType;
-import wit.persistence.SkisTypePersistence;
+import wit.handlers.SkisTypeHandler;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -18,7 +18,7 @@ public class SkisTypeManagementScreen extends BaseScreen {
     private JTable table;
     private DefaultTableModel tableModel;
     private JButton btnAdd, btnEdit, btnDelete, btnBack;
-    private final SkisTypePersistence persistence;
+    private final SkisTypeHandler handler;
 
     /**
      * Constructor for SkisTypeManagementScreen.
@@ -26,7 +26,7 @@ public class SkisTypeManagementScreen extends BaseScreen {
      */
     public SkisTypeManagementScreen(Locale locale) {
         super("SkiTypeManagement", locale);
-        this.persistence = new SkisTypePersistence();
+        this.handler = new SkisTypeHandler();
     }
 
     @Override
@@ -93,7 +93,7 @@ public class SkisTypeManagementScreen extends BaseScreen {
      */
     private void loadData() {
         tableModel.setRowCount(0);
-        List<SkisType> types = persistence.findAll();
+        List<SkisType> types = handler.getAll();
         for (SkisType type : types) {
             tableModel.addRow(new Object[]{
                     type.getId().toString(),
@@ -111,12 +111,12 @@ public class SkisTypeManagementScreen extends BaseScreen {
         dialog.setLayout(new GridLayout(4, 2, 10, 10));
         dialog.setSize(400, 200);
 
-        JTextField txtName = new JTextField();
-        JTextField txtDescription = new JTextField();
+        JTextField txtName = UIFactory.createTextField();
+        JTextField txtDescription = UIFactory.createTextField();
 
-        dialog.add(new JLabel(bundle.getString("label.name")));
+        dialog.add(UIFactory.createSubLabel(bundle.getString("label.name")));
         dialog.add(txtName);
-        dialog.add(new JLabel(bundle.getString("label.description")));
+        dialog.add(UIFactory.createSubLabel(bundle.getString("label.description")));
         dialog.add(txtDescription);
 
         JButton btnSave = UIFactory.createButton(bundle.getString("btn.save"));
@@ -131,8 +131,8 @@ public class SkisTypeManagementScreen extends BaseScreen {
                 return;
             }
 
-            SkisType newType = new SkisType(name, description);
-            persistence.save(newType);
+            handler.create(name, description);
+
             loadData();
             JOptionPane.showMessageDialog(dialog, bundle.getString("success.saved"));
             dialog.dispose();
@@ -142,6 +142,14 @@ public class SkisTypeManagementScreen extends BaseScreen {
 
         dialog.add(btnSave);
         dialog.add(btnCancel);
+
+        // focus na cancel, zeby nie zaznaczal pierwszego jcombobox
+        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowOpened(java.awt.event.WindowEvent e) {
+                btnCancel.requestFocusInWindow();
+            }
+        });
 
         dialog.setLocationRelativeTo(window);
         dialog.setVisible(true);
@@ -158,19 +166,19 @@ public class SkisTypeManagementScreen extends BaseScreen {
         }
 
         String id = tableModel.getValueAt(selectedRow, 0).toString();
-        SkisType type = persistence.findById(UUID.fromString(id)).orElse(null);
+        SkisType type = handler.getById(UUID.fromString(id)).orElse(null);
         if (type == null) return;
 
         JDialog dialog = new JDialog(window, bundle.getString("dialog.edit.title"), true);
         dialog.setLayout(new GridLayout(4, 2, 10, 10));
         dialog.setSize(400, 200);
 
-        JTextField txtName = new JTextField(type.getName());
-        JTextField txtDescription = new JTextField(type.getDescription());
+        JTextField txtName = UIFactory.createTextField(type.getName());
+        JTextField txtDescription = UIFactory.createTextField(type.getDescription());
 
-        dialog.add(new JLabel(bundle.getString("label.name")));
+        dialog.add(UIFactory.createSubLabel(bundle.getString("label.name")));
         dialog.add(txtName);
-        dialog.add(new JLabel(bundle.getString("label.description")));
+        dialog.add(UIFactory.createSubLabel(bundle.getString("label.description")));
         dialog.add(txtDescription);
 
         JButton btnSave = UIFactory.createButton(bundle.getString("btn.save"));
@@ -185,8 +193,8 @@ public class SkisTypeManagementScreen extends BaseScreen {
                 return;
             }
 
-            SkisType updatedType = new SkisType(type.getId(), name, description);
-            persistence.update(updatedType);
+            handler.update(type.getId(), name, description);
+
             loadData();
             JOptionPane.showMessageDialog(dialog, bundle.getString("success.saved"));
             dialog.dispose();
@@ -196,6 +204,14 @@ public class SkisTypeManagementScreen extends BaseScreen {
 
         dialog.add(btnSave);
         dialog.add(btnCancel);
+
+        // focus na cancel, zeby nie zaznaczal pierwszego jcombobox
+        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowOpened(java.awt.event.WindowEvent e) {
+                btnCancel.requestFocusInWindow();
+            }
+        });
 
         dialog.setLocationRelativeTo(window);
         dialog.setVisible(true);
@@ -218,7 +234,7 @@ public class SkisTypeManagementScreen extends BaseScreen {
 
         if (confirm == JOptionPane.YES_OPTION) {
             String id = tableModel.getValueAt(selectedRow, 0).toString();
-            persistence.delete(UUID.fromString(id));
+            handler.delete(UUID.fromString(id));
             loadData();
             JOptionPane.showMessageDialog(window, bundle.getString("success.deleted"));
         }

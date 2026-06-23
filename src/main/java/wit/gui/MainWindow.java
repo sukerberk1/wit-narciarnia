@@ -8,9 +8,8 @@ public class MainWindow extends BaseScreen {
 
     //rzeczy w których jest zmienny tekst
     private JLabel greeting;
-    private JButton btnRental;
-    private JButton btnRentee;
-    private JButton btnSkiis;
+    private JButton btnRental, btnRentee, btnSkiTypes, btnSkis;
+
 
     public MainWindow(Locale locale){
         super("mainwindow" ,locale);
@@ -19,13 +18,14 @@ public class MainWindow extends BaseScreen {
 
     @Override
     protected void buildUI(){
-        mainPanel.setLayout(new GridLayout(4,1,0,10));
+        mainPanel.setLayout(new GridLayout(5,1,0,10));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
         greeting = UIFactory.createLabel("");
         btnRental = UIFactory.createButton("");
         btnRentee = UIFactory.createButton("");
-        btnSkiis = UIFactory.createButton("");
+        btnSkiTypes = UIFactory.createButton("");
+        btnSkis = UIFactory.createButton("");
 
         btnRental.addActionListener(e -> {
             dispose();
@@ -35,15 +35,20 @@ public class MainWindow extends BaseScreen {
             dispose();
             new RenteeManagementScreen(bundle.getLocale()).show();
         });
-        btnSkiis.addActionListener(e -> {
+        btnSkiTypes.addActionListener(e -> {
             dispose();
             new SkisTypeManagementScreen(bundle.getLocale()).show();
+        });
+        btnSkis.addActionListener(e -> {
+            dispose();
+            new SkisManagementScreen(bundle.getLocale()).show();
         });
 
         mainPanel.add(greeting);
         mainPanel.add(btnRental);
         mainPanel.add(btnRentee);
-        mainPanel.add(btnSkiis);
+        mainPanel.add(btnSkiTypes);
+        mainPanel.add(btnSkis);
 
     }
 
@@ -53,7 +58,8 @@ public class MainWindow extends BaseScreen {
         greeting.setText(bundle.getString("title.greeting"));
         btnRental.setText(bundle.getString("btn.rental"));
         btnRentee.setText(bundle.getString("btn.client"));
-        btnSkiis.setText(bundle.getString("btn.skiis"));
+        btnSkiTypes.setText(bundle.getString("btn.skiType"));
+        btnSkis.setText(bundle.getString("btn.skis"));
     }
 
     public static void main(String[] args){

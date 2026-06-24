@@ -51,7 +51,7 @@ public class RentalManagementScreen extends BaseScreen {
         JScrollPane scrollPane = new JScrollPane(table);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
-        JPanel buttonPanel = new JPanel(new GridLayout(2,3,10,10));
+        JPanel buttonPanel = new JPanel(new GridLayout(2, 3, 10, 10));
         btnAdd = UIFactory.createButton("");
         btnReturn = UIFactory.createButton(""); // Przycisk do zwrotu nart
         btnExtend = UIFactory.createButton("");
@@ -86,7 +86,7 @@ public class RentalManagementScreen extends BaseScreen {
         btnDelete.setText(bundle.getString("btn.delete"));
         btnBack.setText(bundle.getString("btn.back"));
 
-        tableModel.setColumnIdentifiers(new String[]{
+        tableModel.setColumnIdentifiers(new String[] {
                 bundle.getString("table.column.id"),
                 bundle.getString("table.column.client"),
                 bundle.getString("table.column.skis"),
@@ -105,12 +105,16 @@ public class RentalManagementScreen extends BaseScreen {
             String skisInfo = rental.getSkis().getBrand() + " " + rental.getSkis().getModel();
             String status = rental.isEnded() ? bundle.getString("status.returned") : bundle.getString("status.active");
 
-            tableModel.addRow(new Object[]{
+            LocalDateTime displayedEndDate = rental.getSecondaryPlannedEndDate() != null
+                    ? rental.getSecondaryPlannedEndDate()
+                    : rental.getPlannedEndDate();
+
+            tableModel.addRow(new Object[] {
                     rental.getId().toString(),
                     clientInfo,
                     skisInfo,
                     rental.getBeginDate().format(displayFormatter),
-                    rental.getPlannedEndDate().format(displayFormatter),
+                    displayedEndDate.format(displayFormatter),
                     status
             });
         }
@@ -128,7 +132,8 @@ public class RentalManagementScreen extends BaseScreen {
         // Renderery, żeby w liście wyświetlał się ładny tekst, a nie hash obiektu
         cbRentee.setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                    boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof Rentee) {
                     Rentee r = (Rentee) value;
@@ -140,7 +145,8 @@ public class RentalManagementScreen extends BaseScreen {
 
         cbSkis.setRenderer(new DefaultListCellRenderer() {
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                    boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof Skis) {
                     Skis s = (Skis) value;
@@ -178,7 +184,8 @@ public class RentalManagementScreen extends BaseScreen {
                     return;
                 }
 
-                Optional<Rental> result = skiRentalHandler.handleRent(selectedRentee.getId(), selectedSkis.getId(), end);
+                Optional<Rental> result = skiRentalHandler.handleRent(selectedRentee.getId(), selectedSkis.getId(),
+                        end);
 
                 if (result.isEmpty()) {
                     JOptionPane.showMessageDialog(dialog, bundle.getString("dialog.unavailable"));
@@ -219,7 +226,7 @@ public class RentalManagementScreen extends BaseScreen {
             return;
         }
 
-        UUID rentalId =UUID.fromString( tableModel.getValueAt(selectedRow, 0).toString());
+        UUID rentalId = UUID.fromString(tableModel.getValueAt(selectedRow, 0).toString());
         Rental rental = skiRentalHandler.getById(rentalId).orElse(null);
 
         if (rental == null || rental.isEnded()) {

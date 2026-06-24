@@ -5,6 +5,9 @@ import java.awt.*;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+/**
+ * Bazowa klasa bstrakcyjna dla ekranów UI
+ */
 public abstract class BaseScreen {
     protected JFrame window;
     protected JPanel mainPanel;

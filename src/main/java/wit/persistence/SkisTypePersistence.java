@@ -5,6 +5,9 @@ import wit.persistence.common.BasePersistence;
 
 import java.util.UUID;
 
+/**
+ * Repozytorium typów nart
+ */
 public class SkisTypePersistence extends BasePersistence<SkisType, UUID> {
     /**
      * Must return valid path to the CSV database file.

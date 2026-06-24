@@ -4,7 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.net.URL;
 
-
+/**
+ * Klasa factory zapewniająca komponenty UI
+ */
 public final class UIFactory {
 
     private UIFactory(){}

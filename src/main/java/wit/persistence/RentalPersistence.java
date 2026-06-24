@@ -7,6 +7,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
+/**
+ * Repozytorium wypożyczeń
+ */
 public class RentalPersistence extends BasePersistence<Rental, UUID> {
     private final RenteePersistence renteePersistence = new RenteePersistence();
     private final SkisPersistence skisPersistence = new SkisPersistence();

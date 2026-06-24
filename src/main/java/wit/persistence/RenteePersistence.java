@@ -3,6 +3,9 @@ package wit.persistence;
 import wit.domain.Rentee;
 import wit.persistence.common.BasePersistence;
 
+/**
+ * Repozytorium wypożyczających
+ */
 public class RenteePersistence extends BasePersistence<Rentee, String> {
 
     /**

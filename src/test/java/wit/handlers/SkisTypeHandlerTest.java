@@ -3,7 +3,10 @@ package wit.handlers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import wit.domain.SkiTiesType;
+import wit.domain.Skis;
 import wit.domain.SkisType;
+import wit.persistence.SkisPersistence;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,17 +23,25 @@ class SkisTypeHandlerTest {
     private static final Path SKIS_TYPE_FILE =
             Path.of("src/main/resources/skiType.csv");
 
+    private static final Path SKI_FILE =
+            Path.of("src/main/resources/ski.csv");
+
     private SkisTypeHandler skisTypeHandler;
+    private SkisPersistence skisPersistence;
 
     @BeforeEach
     void setUp() throws IOException {
         backupFile(SKIS_TYPE_FILE);
+        backupFile(SKI_FILE);
+
         skisTypeHandler = new SkisTypeHandler();
+        skisPersistence = new SkisPersistence();
     }
 
     @AfterEach
     void tearDown() throws IOException {
         restoreFile(SKIS_TYPE_FILE);
+        restoreFile(SKI_FILE);
     }
 
     private void backupFile(Path path) throws IOException {
@@ -119,8 +130,32 @@ class SkisTypeHandlerTest {
 
         assertTrue(skisTypeHandler.getById(created.getId()).isPresent());
 
-        skisTypeHandler.delete(created.getId());
+        boolean deleted = skisTypeHandler.delete(created.getId());
 
+        assertTrue(deleted);
         assertFalse(skisTypeHandler.getById(created.getId()).isPresent());
+    }
+
+    @Test
+    void deleteShouldReturnFalseWhenTypeIsUsedBySkis() {
+        SkisType type = skisTypeHandler.create(
+                "Race",
+                "Racing skis"
+        );
+
+        Skis skis = new Skis(
+                type,
+                "Head",
+                "Worldcup Rebels",
+                SkiTiesType.ALPINE,
+                165.0
+        );
+
+        skisPersistence.save(skis);
+
+        boolean deleted = skisTypeHandler.delete(type.getId());
+
+        assertFalse(deleted);
+        assertTrue(skisTypeHandler.getById(type.getId()).isPresent());
     }
 }

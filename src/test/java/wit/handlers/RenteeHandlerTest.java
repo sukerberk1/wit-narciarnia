@@ -3,12 +3,20 @@ package wit.handlers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import wit.domain.Rental;
 import wit.domain.Rentee;
+import wit.domain.SkiTiesType;
+import wit.domain.Skis;
+import wit.domain.SkisType;
+import wit.persistence.RentalPersistence;
+import wit.persistence.SkisPersistence;
+import wit.persistence.SkisTypePersistence;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,17 +27,39 @@ class RenteeHandlerTest {
     private static final Path RENTEE_FILE =
             Path.of("src/main/resources/rentee.csv");
 
+    private static final Path SKI_FILE =
+            Path.of("src/main/resources/ski.csv");
+
+    private static final Path SKIS_TYPE_FILE =
+            Path.of("src/main/resources/skiType.csv");
+
+    private static final Path RENTAL_FILE =
+            Path.of("src/main/resources/rental.csv");
+
     private RenteeHandler renteeHandler;
+    private RentalPersistence rentalPersistence;
+    private SkisPersistence skisPersistence;
+    private SkisTypePersistence skisTypePersistence;
 
     @BeforeEach
     void setUp() throws IOException {
         backupFile(RENTEE_FILE);
+        backupFile(SKI_FILE);
+        backupFile(SKIS_TYPE_FILE);
+        backupFile(RENTAL_FILE);
+
         renteeHandler = new RenteeHandler();
+        rentalPersistence = new RentalPersistence();
+        skisPersistence = new SkisPersistence();
+        skisTypePersistence = new SkisTypePersistence();
     }
 
     @AfterEach
     void tearDown() throws IOException {
         restoreFile(RENTEE_FILE);
+        restoreFile(SKI_FILE);
+        restoreFile(SKIS_TYPE_FILE);
+        restoreFile(RENTAL_FILE);
     }
 
     private void backupFile(Path path) throws IOException {
@@ -137,8 +167,46 @@ class RenteeHandlerTest {
 
         assertTrue(renteeHandler.getById(created.getId()).isPresent());
 
-        renteeHandler.delete(created.getId());
+        boolean deleted = renteeHandler.delete(created.getId());
 
+        assertTrue(deleted);
         assertFalse(renteeHandler.getById(created.getId()).isPresent());
+    }
+
+    @Test
+    void deleteShouldReturnFalseWhenRenteeHasActiveRental() {
+        Rentee rentee = renteeHandler.create(
+                "DOC-77777",
+                "Jan",
+                "Aktywny",
+                "Klient z aktywnym wypożyczeniem"
+        );
+
+        SkisType type = new SkisType(
+                "All Mountain",
+                "Universal skis"
+        );
+        skisTypePersistence.save(type);
+
+        Skis skis = new Skis(
+                type,
+                "Atomic",
+                "Redster",
+                SkiTiesType.ALPINE,
+                170.0
+        );
+        skisPersistence.save(skis);
+
+        Rental rental = new Rental(
+                rentee,
+                skis,
+                LocalDateTime.now().plusDays(1)
+        );
+        rentalPersistence.save(rental);
+
+        boolean deleted = renteeHandler.delete(rentee.getId());
+
+        assertFalse(deleted);
+        assertTrue(renteeHandler.getById(rentee.getId()).isPresent());
     }
 }

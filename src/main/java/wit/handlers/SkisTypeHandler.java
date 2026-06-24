@@ -5,6 +5,7 @@ import wit.persistence.SkisTypePersistence;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import wit.persistence.SkisPersistence;
 
 /**
  * Obsługuje operacje CRUD dotyczące typów nart.
@@ -17,20 +18,23 @@ public class SkisTypeHandler {
      * Obiekt odpowiedzialny za zapis, odczyt,
      * aktualizację i usuwanie typów nart z pliku CSV.
      */
-    private final SkisTypePersistence skisTypePersistence =
-            new SkisTypePersistence();
+    private final SkisTypePersistence skisTypePersistence = new SkisTypePersistence();
+
+    /**
+     * Obiekt odpowiedzialny za odczytywanie danych o nartach.
+     */
+    private final SkisPersistence skisPersistence = new SkisPersistence();
 
     /**
      * Tworzy i zapisuje nowy typ nart.
      *
-     * @param name nazwa typu nart
+     * @param name        nazwa typu nart
      * @param description opis typu nart
      * @return utworzony typ nart
      */
     public SkisType create(
-        String name,
-        String description
-    ) {
+            String name,
+            String description) {
 
         SkisType skisType = new SkisType(name, description);
         skisTypePersistence.save(skisType);
@@ -59,25 +63,34 @@ public class SkisTypeHandler {
     /**
      * Aktualizuje nazwę i opis istniejącego typu nart.
      *
-     * @param id identyfikator aktualizowanego typu nart
-     * @param name nowa nazwa typu nart
+     * @param id          identyfikator aktualizowanego typu nart
+     * @param name        nowa nazwa typu nart
      * @param description nowy opis typu nart
      * @return zaktualizowany typ nart
      */
     public SkisType update(UUID id, String name, String description) {
-        SkisType updatedSkisType =
-                new SkisType(id, name, description);
+        SkisType updatedSkisType = new SkisType(id, name, description);
 
         skisTypePersistence.update(updatedSkisType);
         return updatedSkisType;
     }
 
     /**
-     * Usuwa typ nart na podstawie jego identyfikatora.
+     * Usuwa typ nart, jeśli nie istnieją narty przypisane do tego typu.
      *
      * @param id identyfikator typu nart przeznaczonego do usunięcia
+     * @return true jeśli usunięto typ nart, false jeśli typ jest używany przez
+     *         narty
      */
-    public void delete(UUID id) {
+    public boolean delete(UUID id) {
+        boolean isUsedBySkis = skisPersistence.findAll().stream()
+                .anyMatch(skis -> skis.getType().getId().equals(id));
+
+        if (isUsedBySkis) {
+            return false;
+        }
+
         skisTypePersistence.delete(id);
+        return true;
     }
 }

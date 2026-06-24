@@ -29,7 +29,7 @@ class SkisHandlerTest {
             Path.of("src/main/resources/ski.csv");
 
     private static final Path SKIS_TYPE_FILE =
-            Path.of("src/main/resources/skisType.csv");
+            Path.of("src/main/resources/skiType.csv");
 
     private static final Path RENTAL_FILE =
             Path.of("src/main/resources/rental.csv");
@@ -212,9 +212,37 @@ class SkisHandlerTest {
 
         assertTrue(skisHandler.getById(created.getId()).isPresent());
 
-        skisHandler.delete(created.getId());
+        boolean deleted = skisHandler.delete(created.getId());
 
+        assertTrue(deleted);
         assertFalse(skisHandler.getById(created.getId()).isPresent());
+    }
+
+    @Test
+    void deleteShouldReturnFalseWhenSkisAreCurrentlyRented() {
+        SkisType type = createAndSaveSkisType();
+        Rentee rentee = createAndSaveRentee();
+
+        Skis skis = skisHandler.create(
+                type,
+                "Rossignol",
+                "Hero Elite",
+                SkiTiesType.ALPINE,
+                165.0
+        );
+
+        Rental rental = new Rental(
+                rentee,
+                skis,
+                LocalDateTime.now().plusDays(1)
+        );
+
+        rentalPersistence.save(rental);
+
+        boolean deleted = skisHandler.delete(skis.getId());
+
+        assertFalse(deleted);
+        assertTrue(skisHandler.getById(skis.getId()).isPresent());
     }
 
     @Test

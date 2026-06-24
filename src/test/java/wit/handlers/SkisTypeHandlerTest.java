@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class SkisTypeHandlerTest {
 
     private static final Path SKIS_TYPE_FILE =
-            Path.of("src/main/resources/skisType.csv");
+            Path.of("src/main/resources/skiType.csv");
 
     private SkisTypeHandler skisTypeHandler;
 

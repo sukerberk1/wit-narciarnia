@@ -40,6 +40,7 @@ public class SkiRentalHandler {
 
     public Rental handleProlongRental(UUID rentalId) {
         Rental rental = rentalPersistence.findById(rentalId).get();
+        rental.prolongRental();
         rentalPersistence.update(rental);
         return rental;
     }

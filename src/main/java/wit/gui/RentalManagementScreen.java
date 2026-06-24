@@ -101,7 +101,7 @@ public class RentalManagementScreen extends BaseScreen {
         btnDelete.setText(bundle.getString("btn.delete"));
         btnBack.setText(bundle.getString("btn.back"));
 
-        tableModel.setColumnIdentifiers(new String[] {
+        tableModel.setColumnIdentifiers(new String[]{
                 bundle.getString("table.column.id"),
                 bundle.getString("table.column.client"),
                 bundle.getString("table.column.skis"),
@@ -297,9 +297,6 @@ public class RentalManagementScreen extends BaseScreen {
             loadData();
             JOptionPane.showMessageDialog(window, bundle.getString("success.extended"));
         }
-    }
-
-
     }
 
     /**

@@ -29,6 +29,9 @@ public class SkisTypeManagementScreen extends BaseScreen {
         this.handler = new SkisTypeHandler();
     }
 
+    /**
+     * Constructs primary UI, including data table and control panel.
+     */
     @Override
     protected void buildUI() {
         mainPanel.setLayout(new BorderLayout(10, 10));
@@ -71,6 +74,9 @@ public class SkisTypeManagementScreen extends BaseScreen {
         loadData();
     }
 
+    /**
+     * Updates all UI text elements using the current localization bundle.
+     */
     @Override
     protected void updateTexts() {
         window.setTitle(bundle.getString("window.title"));
@@ -234,9 +240,15 @@ public class SkisTypeManagementScreen extends BaseScreen {
 
         if (confirm == JOptionPane.YES_OPTION) {
             String id = tableModel.getValueAt(selectedRow, 0).toString();
-            handler.delete(UUID.fromString(id));
-            loadData();
-            JOptionPane.showMessageDialog(window, bundle.getString("success.deleted"));
+
+            boolean success = handler.delete(UUID.fromString(id));
+
+            if (success) {
+                loadData();
+                JOptionPane.showMessageDialog(window, bundle.getString("success.deleted"));
+            }else{
+                JOptionPane.showMessageDialog(window, bundle.getString("failed.deleted"));
+            }
         }
     }
 }

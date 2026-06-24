@@ -16,10 +16,9 @@ import java.util.Locale;
 import java.util.UUID;
 
 /**
- * Screen for managing skis owned by the business (CRUD operations).
- * Allows users to add, edit, delete and view skis.
+ * Screen for managing ski inventory (CRUD operations)
+ * Allows users to add, edit, delete, and view individual ski units.
  */
-
 public class SkisManagementScreen extends BaseScreen {
     private JTable table;
     private DefaultTableModel tableModel;
@@ -28,12 +27,20 @@ public class SkisManagementScreen extends BaseScreen {
     private final SkisHandler skisHandler;
     private final SkisTypeHandler typeHandler;
 
+    /**
+     * Initializes ski management screen and necessary data handlers.
+     *
+     * @param loc Initial language locale for UI.
+     */
     public SkisManagementScreen(Locale loc) {
         super("SkisManagement", loc);
         this.skisHandler = new SkisHandler();
         this.typeHandler = new SkisTypeHandler();
     }
 
+    /**
+     * Constructs primary UI, including data table and control panel.
+     */
     @Override
     protected void buildUI() {
         mainPanel.setLayout(new BorderLayout(10, 10));
@@ -73,6 +80,9 @@ public class SkisManagementScreen extends BaseScreen {
         loadData();
     }
 
+    /**
+     * Updates all UI text elements using current localization bundle.
+     */
     @Override
     protected void updateTexts() {
         window.setTitle(bundle.getString("window.title"));
@@ -92,6 +102,9 @@ public class SkisManagementScreen extends BaseScreen {
         loadData();
     }
 
+    /**
+     * Fetches all ski records from handler and populates the table.
+     */
     private void loadData() {
         tableModel.setRowCount(0);
         List<Skis> skisList = skisHandler.getAll();
@@ -107,6 +120,9 @@ public class SkisManagementScreen extends BaseScreen {
         }
     }
 
+    /**
+     * Displays a dialog allowing the user to add a new pair of skis to the inventory.
+     */
     private void showAddDialog() {
         JDialog dialog = new JDialog(window, bundle.getString("dialog.add.title"), true);
         dialog.setLayout(new GridLayout(6, 2, 10, 10));
@@ -173,7 +189,6 @@ public class SkisManagementScreen extends BaseScreen {
         dialog.add(btnSave);
         dialog.add(btnCancel);
 
-        // Fix initial focus stealing
         dialog.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowOpened(java.awt.event.WindowEvent e) {
@@ -185,6 +200,9 @@ public class SkisManagementScreen extends BaseScreen {
         dialog.setVisible(true);
     }
 
+    /**
+     * Displays a dialog allowing the user to edit details of selected skis.
+     */
     private void showEditDialog() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow == -1) {
@@ -201,12 +219,9 @@ public class SkisManagementScreen extends BaseScreen {
         dialog.setLayout(new GridLayout(6, 2, 10, 10));
         dialog.setSize(500, 350);
 
-        // Setup pre-filled inputs
         JComboBox<SkisType> cbType = UIFactory.createComboBox(typeHandler.getAll().toArray(new SkisType[0]));
         JComboBox<SkiTiesType> cbTies = UIFactory.createComboBox(SkiTiesType.values());
 
-        // Pre-select current values
-        // Note: ComboBox needs matching objects to select them. If equality fails, you might need a loop to find the match by ID.
         cbType.setSelectedItem(skis.getType());
         cbTies.setSelectedItem(skis.getTies());
 
@@ -252,7 +267,6 @@ public class SkisManagementScreen extends BaseScreen {
                     return;
                 }
 
-                // Using the specific constructor that includes UUID
                 skisHandler.update(skis.getId(), selectedType, brand, model, selectedTies, length);
 
 
@@ -280,6 +294,10 @@ public class SkisManagementScreen extends BaseScreen {
         dialog.setVisible(true);
     }
 
+    /**
+     * Deletes currently selected ski record after user confirmation.
+     * Displays a success or failure message based on the handler's response.
+     */
     private void deleteSelected() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow == -1) {
@@ -295,10 +313,16 @@ public class SkisManagementScreen extends BaseScreen {
         if (confirm == JOptionPane.YES_OPTION) {
             String id = tableModel.getValueAt(selectedRow, 0).toString();
 
-            skisHandler.delete(UUID.fromString(id));
-            loadData();
-            JOptionPane.showMessageDialog(window, bundle.getString("success.deleted"));
+            boolean success = skisHandler.delete(UUID.fromString(id));
+
+            if (success) {
+                loadData();
+                JOptionPane.showMessageDialog(window, bundle.getString("success.deleted"));
+            } else {
+                JOptionPane.showMessageDialog(window, bundle.getString("failed.deleted"));
+            }
         }
     }
 }
+
 

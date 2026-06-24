@@ -4,11 +4,26 @@ import javax.swing.*;
 import java.awt.*;
 import java.net.URL;
 
-
+/**
+ * A utility factory class delivering
+ * helper methods for creating consistently
+ * styled Swing UI components.
+ */
 public final class UIFactory {
 
+
+    /**
+     * Private constructor to prevent
+     * instantiation of this utility class.
+     */
     private UIFactory(){}
 
+    /**
+     * Creates a large, bold label for main window titles and greetings.
+     *
+     * @param text The text to be displayed on the label.
+     * @return A styled {@link JLabel} with a large bold font (size 30).
+     */
     public static JLabel createLabel(String text){
         JLabel label = new JLabel(text);
 
@@ -17,6 +32,12 @@ public final class UIFactory {
         return label;
     }
 
+    /**
+     * Creates a smaller, bold label used for form inputs.
+     *
+     * @param text The text to be displayed on the label.
+     * @return A styled {@link JLabel} with a medium bold font (size 15).
+     */
     public static JLabel createSubLabel(String text){
         JLabel label = new JLabel(text);
 
@@ -25,6 +46,13 @@ public final class UIFactory {
         return label;
     }
 
+    /**
+     * Creates a simple button with consistent colors.
+     * The method controls internal padding and a hand cursor on hover.
+     *
+     * @param text The text to be displayed on the button.
+     * @return Styled {@link JButton}.
+     */
     public static JButton createButton(String text) {
         JButton button = new JButton(text);
         button.setFocusPainted(false);
@@ -41,6 +69,15 @@ public final class UIFactory {
         return button;
     }
 
+    /**
+     * Creates a button represented by an image icon.
+     * Meant for elements like language selection flags.
+     *
+     * @param path   The relative resource path to the image (e.g., "/icons/en.png").
+     * @param width  The desired width to scale the image to.
+     * @param height The desired height to scale the image to.
+     * @return A {@link JButton} displaying the image, or an error text button if the image is missing.
+     */
     public static JButton createIconButton(String path, int width, int height) {
         URL imgUrl = MainWindow.class.getResource(path);
 
@@ -64,6 +101,14 @@ public final class UIFactory {
         return button;
     }
 
+    /**
+     * Creates a customized dropdown box with dynamic border styling.
+     * The border changes when in focus.
+     *
+     * @param items An array of items to be displayed in the list.
+     * @param <T>   The type of elements in the combo box.
+     * @return A styled {@link JComboBox} with hover and focus.
+     */
     public static <T> JComboBox<T> createComboBox(T[] items) {
         JComboBox<T> comboBox = new JComboBox<>(items);
 
@@ -94,7 +139,13 @@ public final class UIFactory {
 
         return comboBox;
     }
-
+    /**
+     * Creates a customized text field.
+     * Border changes when in focus.
+     *
+     * @param defaultText
+     * @return A styled {@link JTextField}.
+     */
     public static JTextField createTextField(String defaultText) {
         JTextField textField = new JTextField(defaultText);
 
@@ -136,7 +187,11 @@ public final class UIFactory {
         return textField;
     }
 
-    //dla pustych
+    /**
+     * Creates an empty, customized text field.
+     *
+     * @return A styled, empty {@link JTextField}.
+     */
     public static JTextField createTextField() {
         return createTextField("");
     }

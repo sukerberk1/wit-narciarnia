@@ -4,23 +4,29 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Locale;
 
+
 /**
- * Główne okno aplikacji
+ * Entry point and navigation menu.
+ * Allows users to access different management screens.
  */
 public class MainWindow extends BaseScreen {
 
-    //rzeczy w których jest zmienny tekst
+    /**
+     * Initializes main window with specified locale.
+     *
+     * @param locale Initial language setting for UI.
+     */
     private JLabel greeting;
     private JButton btnRental, btnRentee, btnSkiTypes, btnSkis;
-
 
     public MainWindow(Locale locale){
         super("mainwindow" ,locale);
     }
 
-
     /**
-     * Budowanie głównego interfejsu
+     * Constructs main menu layout.
+     * Initializes grid layout, creates buttons via UIFactory,
+     * sets up action listeners for navigation.
      */
     @Override
     protected void buildUI(){
@@ -58,6 +64,10 @@ public class MainWindow extends BaseScreen {
 
     }
 
+    /**
+     * Refreshes text components with values from current resource bundle.
+     * Triggered during initialization and whenever the language is switched.
+     */
     @Override
     protected void updateTexts(){
         window.setTitle(bundle.getString("window.title"));
@@ -68,6 +78,12 @@ public class MainWindow extends BaseScreen {
         btnSkis.setText(bundle.getString("btn.skis"));
     }
 
+    /**
+     * Entry point.
+     * Launches GUI with default Polish locale.
+     *
+     * @param args CLI arguments (ignored).
+     */
     public static void main(String[] args){
         SwingUtilities.invokeLater(() -> {
             MainWindow app = new MainWindow(new Locale("pl","PL"));

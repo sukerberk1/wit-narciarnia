@@ -17,6 +17,10 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Screen for managing active and past ski rentals (CRUD operations)
+ * Allows users to create rentals, process returns, extend active rentals, and delete records.
+ */
 public class RentalManagementScreen extends BaseScreen {
     private JTable table;
     private DefaultTableModel tableModel;
@@ -28,6 +32,11 @@ public class RentalManagementScreen extends BaseScreen {
 
     private final DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
+    /**
+     * Initializes rental management screen and necessary data handlers.
+     *
+     * @param locale Initial language locale for UI.
+     */
     public RentalManagementScreen(Locale locale) {
         super("RentalManagement", locale);
         this.skiRentalHandler = new SkiRentalHandler();
@@ -35,6 +44,9 @@ public class RentalManagementScreen extends BaseScreen {
         this.skisHandler = new SkisHandler();
     }
 
+    /**
+     * Constructs primary UI, including data table and control panel.
+     */
     @Override
     protected void buildUI() {
         mainPanel.setLayout(new BorderLayout(10, 10));
@@ -77,6 +89,9 @@ public class RentalManagementScreen extends BaseScreen {
         loadData();
     }
 
+    /**
+     * Updates all UI text elements using current resource bundle.
+     */
     @Override
     protected void updateTexts() {
         window.setTitle(bundle.getString("window.title"));
@@ -86,7 +101,7 @@ public class RentalManagementScreen extends BaseScreen {
         btnDelete.setText(bundle.getString("btn.delete"));
         btnBack.setText(bundle.getString("btn.back"));
 
-        tableModel.setColumnIdentifiers(new String[]{
+        tableModel.setColumnIdentifiers(new String[] {
                 bundle.getString("table.column.id"),
                 bundle.getString("table.column.client"),
                 bundle.getString("table.column.skis"),
@@ -97,6 +112,9 @@ public class RentalManagementScreen extends BaseScreen {
         loadData();
     }
 
+    /**
+     * Fetches all rental records from handler and populates the table.
+     */
     private void loadData() {
         tableModel.setRowCount(0);
         List<Rental> rentals = skiRentalHandler.getAllRentals();
@@ -116,6 +134,9 @@ public class RentalManagementScreen extends BaseScreen {
         }
     }
 
+    /**
+     * Displays dialog allowing user to create a new rental record.
+     */
     private void showAddDialog() {
         JDialog dialog = new JDialog(window, bundle.getString("dialog.add.title"), true);
         dialog.setLayout(new GridLayout(5, 2, 10, 10));
@@ -178,7 +199,8 @@ public class RentalManagementScreen extends BaseScreen {
                     return;
                 }
 
-                Optional<Rental> result = skiRentalHandler.handleRent(selectedRentee.getId(), selectedSkis.getId(), end);
+                Optional<Rental> result = skiRentalHandler.handleRent(selectedRentee.getId(), selectedSkis.getId(),
+                        end);
 
                 if (result.isEmpty()) {
                     JOptionPane.showMessageDialog(dialog, bundle.getString("dialog.unavailable"));
@@ -212,6 +234,9 @@ public class RentalManagementScreen extends BaseScreen {
         dialog.setVisible(true);
     }
 
+    /**
+     * Processes return of currently selected rental.
+     */
     private void processReturn() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow == -1) {
@@ -239,6 +264,9 @@ public class RentalManagementScreen extends BaseScreen {
         }
     }
 
+    /**
+     * Extends duration of selected rental.
+     */
     private void processExtend() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow == -1) {
@@ -271,6 +299,12 @@ public class RentalManagementScreen extends BaseScreen {
         }
     }
 
+
+    }
+
+    /**
+     * Deletes currently selected rental record.
+     */
     private void deleteSelected() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow == -1) {
@@ -286,6 +320,7 @@ public class RentalManagementScreen extends BaseScreen {
         if (confirm == JOptionPane.YES_OPTION) {
             String id = tableModel.getValueAt(selectedRow, 0).toString();
             skiRentalHandler.removeById(UUID.fromString(id));
+            JOptionPane.showMessageDialog(window, bundle.getString("success.deleted"));
             loadData();
         }
     }

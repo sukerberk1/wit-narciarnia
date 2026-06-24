@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Screen for managing rentess/clients (CRUD operations).
- * Allows users to add, edit, delete and view clients.
+ * Screen for managing clients (CRUD operations)
+ * Allows users to add, edit, delete, and view clients.
  */
 public class RenteeManagementScreen extends BaseScreen {
     private JTable table;
@@ -19,11 +19,19 @@ public class RenteeManagementScreen extends BaseScreen {
     private JButton btnAdd, btnEdit, btnDelete, btnBack;
     private final RenteeHandler handler;
 
+    /**
+     * Initializes client management screen and its data handler.
+     *
+     * @param locale Initial language locale for UI.
+     */
     public RenteeManagementScreen(Locale locale) {
         super("RenteeManagement", locale);
         this.handler = new RenteeHandler();
     }
 
+    /**
+     * Constructs primary UI, including data table and control panel.
+     */
     @Override
     protected void buildUI() {
         mainPanel.setLayout(new BorderLayout(10, 10));
@@ -65,6 +73,9 @@ public class RenteeManagementScreen extends BaseScreen {
         loadData();
     }
 
+    /**
+     * Updates all UI text elements using current localization bundle.
+     */
     @Override
     protected void updateTexts() {
         window.setTitle(bundle.getString("window.title"));
@@ -82,6 +93,9 @@ public class RenteeManagementScreen extends BaseScreen {
         loadData();
     }
 
+    /**
+     * Fetches all client records from handler and populates the table.
+     */
     private void loadData() {
         tableModel.setRowCount(0);
         List<Rentee> clients = handler.getAll();
@@ -94,7 +108,9 @@ public class RenteeManagementScreen extends BaseScreen {
             });
         }
     }
-
+    /**
+     * Displays dialog allowing user to add new a client.
+     */
     private void showAddDialog() {
         JDialog dialog = new JDialog(window, bundle.getString("dialog.add.title"), true);
         dialog.setLayout(new GridLayout(5, 2, 10, 10));
@@ -157,6 +173,10 @@ public class RenteeManagementScreen extends BaseScreen {
         dialog.setVisible(true);
     }
 
+    /**
+     * Displays a dialog allowing the user to edit selected client's details.
+     * Document ID field is disabled to prevent database inconsistencies.
+     */
     private void showEditDialog() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow == -1) {
@@ -224,6 +244,10 @@ public class RenteeManagementScreen extends BaseScreen {
         dialog.setVisible(true);
     }
 
+    /**
+     * Deletes currently selected client record after user confirmation.
+     * Displays a success or failure message based on handler's response.
+     */
     private void deleteSelected() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow == -1) {
@@ -238,9 +262,14 @@ public class RenteeManagementScreen extends BaseScreen {
 
         if (confirm == JOptionPane.YES_OPTION) {
             String id = tableModel.getValueAt(selectedRow, 0).toString(); // ID jako String
-            handler.delete(id);
-            loadData();
-            JOptionPane.showMessageDialog(window, bundle.getString("success.deleted"));
+
+            boolean success = handler.delete(id);
+            if (success) {
+                loadData();
+                JOptionPane.showMessageDialog(window, bundle.getString("success.deleted"));
+            } else {
+                JOptionPane.showMessageDialog(window, bundle.getString("failed.deleted"));
+            }
         }
     }
 }

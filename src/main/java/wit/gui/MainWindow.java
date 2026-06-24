@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Locale;
 
+/**
+ * Główne okno aplikacji
+ */
 public class MainWindow extends BaseScreen {
 
     //rzeczy w których jest zmienny tekst
@@ -16,6 +19,9 @@ public class MainWindow extends BaseScreen {
     }
 
 
+    /**
+     * Budowanie głównego interfejsu
+     */
     @Override
     protected void buildUI(){
         mainPanel.setLayout(new GridLayout(5,1,0,10));

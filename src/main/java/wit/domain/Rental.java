@@ -5,6 +5,9 @@ import wit.domain.common.EntityBase;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Encja reprezentująca wypożyczenie
+ */
 public class Rental extends EntityBase<UUID> {
     private final Rentee rentee;
     private final Skis skis;
@@ -12,7 +15,7 @@ public class Rental extends EntityBase<UUID> {
     private final LocalDateTime plannedEndDate;
     private LocalDateTime secondaryPlannedEndDate;
     private LocalDateTime actualEndDate;
-    private final boolean isEnded;
+    private boolean isEnded;
 
     /**
      * Recommended constructor
@@ -66,20 +69,37 @@ public class Rental extends EntityBase<UUID> {
         return actualEndDate;
     }
 
+    /**
+     * Sprawdza czy wypożyczenie jest już zakończone
+     *
+     * @return
+     */
     public boolean isEnded() {
         return isEnded;
     }
 
+    /**
+     * Zwraca czy wypożyczenie było już przedłużane
+     *
+     * @return
+     */
     public boolean isProlonged() {
         return secondaryPlannedEndDate != null;
     }
 
+    /**
+     * Przedłuża wypożyczenie
+     */
     public void prolongRental() {
         if (this.secondaryPlannedEndDate == null)
             this.secondaryPlannedEndDate = plannedEndDate.plusDays(7);
     }
 
+    /**
+     * Kończy wypożyczenie.
+     */
     public void endRental() {
         this.actualEndDate = LocalDateTime.now();
+        this.isEnded = true;
     }
 }

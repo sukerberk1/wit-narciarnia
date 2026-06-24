@@ -6,6 +6,9 @@ import wit.persistence.common.BasePersistence;
 
 import java.util.UUID;
 
+/**
+ * Repozytorium nart
+ */
 public class SkisPersistence extends BasePersistence<Skis, UUID> {
     private final SkisTypePersistence skisTypePersistence = new SkisTypePersistence();
 

@@ -3,9 +3,9 @@ package wit.gui;
 import wit.domain.Rental;
 import wit.domain.Rentee;
 import wit.domain.Skis;
-import wit.handlers.SkisHandler;
 import wit.handlers.RenteeHandler;
 import wit.handlers.SkiRentalHandler;
+import wit.handlers.SkisHandler;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -51,7 +51,7 @@ public class RentalManagementScreen extends BaseScreen {
         JScrollPane scrollPane = new JScrollPane(table);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
-        JPanel buttonPanel = new JPanel(new GridLayout(2,3,10,10));
+        JPanel buttonPanel = new JPanel(new GridLayout(2, 3, 10, 10));
         btnAdd = UIFactory.createButton("");
         btnReturn = UIFactory.createButton(""); // Przycisk do zwrotu nart
         btnExtend = UIFactory.createButton("");
@@ -104,13 +104,13 @@ public class RentalManagementScreen extends BaseScreen {
             String clientInfo = rental.getRentee().getFirstName() + " " + rental.getRentee().getLastName();
             String skisInfo = rental.getSkis().getBrand() + " " + rental.getSkis().getModel();
             String status = rental.isEnded() ? bundle.getString("status.returned") : bundle.getString("status.active");
-
+            LocalDateTime actualPlannedEnd = rental.getSecondaryPlannedEndDate() != null ? rental.getSecondaryPlannedEndDate() : rental.getPlannedEndDate();
             tableModel.addRow(new Object[]{
                     rental.getId().toString(),
                     clientInfo,
                     skisInfo,
                     rental.getBeginDate().format(displayFormatter),
-                    rental.getPlannedEndDate().format(displayFormatter),
+                    actualPlannedEnd.format(displayFormatter),
                     status
             });
         }
@@ -219,7 +219,7 @@ public class RentalManagementScreen extends BaseScreen {
             return;
         }
 
-        UUID rentalId =UUID.fromString( tableModel.getValueAt(selectedRow, 0).toString());
+        UUID rentalId = UUID.fromString(tableModel.getValueAt(selectedRow, 0).toString());
         Rental rental = skiRentalHandler.getById(rentalId).orElse(null);
 
         if (rental == null || rental.isEnded()) {
@@ -258,6 +258,11 @@ public class RentalManagementScreen extends BaseScreen {
                 bundle.getString("dialog.extend.confirm"),
                 bundle.getString("btn.extend"),
                 JOptionPane.YES_NO_OPTION);
+
+        if (rental.isProlonged()) {
+            JOptionPane.showMessageDialog(window, bundle.getString("error.already_extended"));
+            return;
+        }
 
         if (confirm == JOptionPane.YES_OPTION) {
             skiRentalHandler.handleProlongRental(rentalId);

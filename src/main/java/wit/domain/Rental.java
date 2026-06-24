@@ -70,6 +70,10 @@ public class Rental extends EntityBase<UUID> {
         return isEnded;
     }
 
+    public boolean isProlonged() {
+        return secondaryPlannedEndDate != null;
+    }
+
     public void prolongRental() {
         if (this.secondaryPlannedEndDate == null)
             this.secondaryPlannedEndDate = plannedEndDate.plusDays(7);
